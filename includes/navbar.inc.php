@@ -20,11 +20,11 @@
                             Account
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/G19BCSY3A/pages/auth/login.php">Login</a></li>
+                            <li><a class="dropdown-item" href="/G19BCSY3A/pages/login.php">Login</a></li>
                             <li>
                                 <hr class="dropdown-divider"> 
                             </li>
-                            <li><a class="dropdown-item" href="/G19BCSY3A/pages/auth/register.php">Register</a></li>
+                            <li><a class="dropdown-item" href="/G19BCSY3A/pages/register.php">Register</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
