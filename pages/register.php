@@ -1,12 +1,12 @@
 <?php
 $nameErr = $usernameErr = '';
-$name = $username ='';
+$name = $username = '';
 
 if (isset($_POST['name'], $_POST['username'], $_POST['passwd'], $_POST['confirmPasswd'])) {
     $name = trim($_POST['name']);
     $username = trim($_POST['username']);
     $passwd = trim($_POST['passwd']);
-    $confirmPasswd =  trim($_POST['confirmPasswd']);
+    $confirmPasswd = trim($_POST['confirmPasswd']);
     if (empty($name)) {
         $nameErr = 'please input name!';
     }
@@ -19,13 +19,13 @@ if (isset($_POST['name'], $_POST['username'], $_POST['passwd'], $_POST['confirmP
     if ($passwd !== $confirmPasswd) {
         $passwdErr = 'password does not match!';
     }
-    
+
     if (usernameExists($username)) {
         $usernameErr = 'please choose another username!';
     }
     if (empty($nameErr) && empty($usernameErr) && empty($passwdErr)) {
         if (registerUser($name, $username, $passwd)) {
-            $name = $username ='';
+            $name = $username = '';
             echo '<div class="alert alert-success" role="alert">
             Registration successful! You can now <a href="./?page=login" class="alert-link">login here</a>.
           </div>';
