@@ -24,35 +24,35 @@ function registerUser($name, $username, $passwd)
     return false;
 }
 
-function logUserIn($username, $passwd)
+function loginUserIn($username, $passwd)
 {
-    global $db;
-    $query = $db->prepare('SELECT * FROM tbl_users WHERE username = ? AND passwd = ?');
-    $query->bind_param('ss', $username, $passwd);
-    $query->execute();
-    $result = $query->get_result();
-    if ($result->num_rows) {
-        $user = $result->fetch_object();
-    }
+  global $db;
+  $query = $db->prepare('SELECT * FROM tbl_users WHERE username = ? AND passwd = ?');
+  $query->bind_param('ss', $username, $passwd);
+  $query->execute();
+  $result = $query->get_result();
+  if ($result->num_rows) {
+    return $result->fetch_object();
+  }
     return false;
 }
-
 function loggedInUser()
 {
-    global $db;
-    if (!isset($_SESSION['user_id'])) {
-        return null;
-    }
-    $user_id = $_SESSION['user_id'];
-    $query = $db->prepare(query: 'SELECT * FROM tbl_users WHERE id = ?');
-    $query->bind_param('d', $user_id);
-    $query->execute();
-    $result = $query->get_result();
-    if ($result->num_rows) {
-        return $result->fetch_object();
-    }
+  global $db;
+  if (!isset($_SESSION['user_id'])) {
+    return null;
+  }
+  $user_id = $_SESSION['user_id'];
+  $query = $db->prepare('SELECT * FROM tbl_users WHERE id = ?');
+  $query->bind_param('d', $user_id);
+  $query->execute();
+  $result = $query->get_result();
+  if ($result->num_rows) {
+    return $result->fetch_object();
+  }
     return null;
 }
+
 
 
 

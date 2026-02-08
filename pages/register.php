@@ -1,5 +1,5 @@
 <?php
-$nameErr = $usernameErr = '';
+$nameErr = $usernameErr = $passwdErr​ = '';
 $name = $username = '';
 
 if (isset($_POST['name'], $_POST['username'], $_POST['passwd'], $_POST['confirmPasswd'])) {

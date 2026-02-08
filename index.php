@@ -1,6 +1,9 @@
 <?php
+ob_start();
 require_once './init/init.php';
+
 $user = loggedInUser();
+
 include './includes/header.inc.php';
 include './includes/navbar.inc.php';
 
