@@ -1,27 +1,27 @@
 <?php
-  $usernameErr = $passwdErr = '';
-  $username = '';
+$usernameErr = $passwdErr = '';
+$username = '';
 
-  if (isset($_POST['username'], $_POST['passwd'])) {
-    $username = trim($_POST['username']);
-    $passwd = trim($_POST['passwd']);
+if (isset($_POST['username'], $_POST['passwd'])) {
+  $username = trim($_POST['username']);
+  $passwd = trim($_POST['passwd']);
   if (empty($username)) {
     $usernameErr = 'please input username!';
   }
-    if (empty($passwd)) {
-      $passwdErr = 'please input password!';
-    }
+  if (empty($passwd)) {
+    $passwdErr = 'please input password!';
+  }
   if (empty($usernameErr) && empty($passwdErr)) {
     $user = loginUserIn($username, $passwd);
-      if ($user !== false) {
-        $_SESSION['user_id'] = $user->id;
-        header('Location: ./?page=dashboard');
-      } else {
-        echo'<div class="alert alert-danger" role="alert">
+    if ($user !== false) {
+      $_SESSION['user_id'] = $user->id;
+      header('Location: ./?page=dashboard');
+    } else {
+      echo '<div class="alert alert-danger" role="alert">
         Username or password is incorrect!</div>';
-      }
     }
-  } 
+  }
+}
 ?>
 <form method="post" action="?page=login" class="col-md-8 col-lg-6 mx-auto">
   <h3>Login Page</h3>

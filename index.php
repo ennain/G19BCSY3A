@@ -9,8 +9,8 @@ include './includes/navbar.inc.php';
 
 
 
-$available_pages = ['login', 'register', 'dashboard' , 'logout'];
-$logged_in_pages = ['dashboard'];
+$available_pages = ['login', 'register', 'dashboard', 'logout', 'profile'];
+$logged_in_pages = ['dashboard', 'profile'];
 $non_logged_in_pages = ['login', 'register'];
 
 $page = '';

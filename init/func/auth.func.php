@@ -1,27 +1,27 @@
 <?php
 function usernameExists($username)
 {
-    global $db;
-    $query = $db->prepare('SELECT * FROM tbl_users WHERE username = ?');
-    $query->bind_param('s', $username);
-    $query->execute();
-    $result = $query->get_result();
-    if ($result->num_rows) {
-        return true;
-    }
-    return false;
+  global $db;
+  $query = $db->prepare('SELECT * FROM tbl_users WHERE username = ?');
+  $query->bind_param('s', $username);
+  $query->execute();
+  $result = $query->get_result();
+  if ($result->num_rows) {
+    return true;
+  }
+  return false;
 }
 
 function registerUser($name, $username, $passwd)
 {
-    global $db;
-    $query = $db->prepare('INSERT INTO tbl_users (name,username,passwd) VALUES (?,?,?)');
-    $query->bind_param('sss', $name, $username, $passwd);
-    $query->execute();
-    if ($db->affected_rows) {
-        return true;
-    }
-    return false;
+  global $db;
+  $query = $db->prepare('INSERT INTO tbl_users (name,username,passwd) VALUES (?,?,?)');
+  $query->bind_param('sss', $name, $username, $passwd);
+  $query->execute();
+  if ($db->affected_rows) {
+    return true;
+  }
+  return false;
 }
 
 function loginUserIn($username, $passwd)
@@ -34,7 +34,7 @@ function loginUserIn($username, $passwd)
   if ($result->num_rows) {
     return $result->fetch_object();
   }
-    return false;
+  return false;
 }
 function loggedInUser()
 {
@@ -50,10 +50,45 @@ function loggedInUser()
   if ($result->num_rows) {
     return $result->fetch_object();
   }
-    return null;
+  return null;
 }
 
 
+function isAdmin()
+{
+  $user = loggedInUser();
+  if ($user && $user->level === 'admin') {
+    return true;
+  }
+  return false;
+}
+
+function isUserHasPassword($passwd)
+{
+  global $db;
+  $user = loggedInUser();
+  $query = $db->prepare('SELECT * FROM tbl_users WHERE id = ? AND passwd = ?');
+  $query->bind_param('ss', $user->id, $passwd);
+  $query->execute();
+  $result = $query->get_result();
+  if ($result->num_rows) {
+    return true;
+  }
+  return false;
+}
+
+function setUserNewPassword($passwd)
+{
+  global $db;
+  $user = loggedInUser();
+  $query = $db->prepare('UPDATE tbl_users SET passwd = ? WHERE id = ?');
+  $query->bind_param('ss', $passwd, $user->id);
+  $query->execute();
+  if ($db->affected_rows) {
+    return true;
+  }
+  return false;
+}
 
 
 ?>
