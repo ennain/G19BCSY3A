@@ -90,5 +90,60 @@ function setUserNewPassword($passwd)
   return false;
 }
 
+function insertImage($file)
+{
+  global $db;
+  $image_name = $file['photo']['name'];
+  $image_tmp = $file['photo']['tmp_name'];
+  $old_image = loggedInUser()->photo;
+
+  $db->begin_transaction();
+
+  $query = $db->prepare('UPDATE tbl_users SET photo = ? WHERE id = ?');
+  $query->bind_param('sd', $image_name, $_SESSION['user_id']);
+  $query->execute();
+  if (!$query->affected_rows) {
+    $db->rollback();
+    return false;
+  }
+  if (!move_uploaded_file($image_tmp, './assets/images/' . $image_name)) {
+    $db->rollback();
+    return false;
+  }
+  if (!empty($old_image)) {
+    unlink("./assets/images/" . $old_image);
+  }
+
+  $db->commit();
+
+  return true;
+}
+
+function getUserImage($user_id)
+{
+  global $db;
+  $query = $db->prepare('SELECT photo FROM tbl_users WHERE id = ?');
+  $query->bind_param('d', $user_id);
+  $query->execute();
+  $result = $query->get_result();
+  if ($result->num_rows) {
+    return $result->fetch_object()->photo;
+  }
+  return null;
+}
+
+function deleteUserImage()
+{
+  global $db;
+  $user = loggedInUser();
+  $query = $db->prepare('UPDATE tbl_users SET photo = NULL WHERE id = ?');
+  $query->bind_param('d', $user->id);
+  $query->execute();
+  if ($db->affected_rows) {
+    return true;
+  }
+  return false;
+}
+
 
 ?>
