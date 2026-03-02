@@ -90,52 +90,59 @@ function setUserNewPassword($passwd)
   return false;
 }
 
-function insertImage($file)
-{
-  global $db;
-  $image_name = $file['photo']['name'];
-  $image_tmp = $file['photo']['tmp_name'];
-  $old_image = loggedInUser()->photo;
 
-  $db->begin_transaction();
+function uploadImage($image){
+  $img_name = $image['name'];
+  $img_size = $image['size'];
+  $img_tmp = $image['tmp_name'];
+  $error = $image['error'];
 
-  $query = $db->prepare('UPDATE tbl_users SET photo = ? WHERE id = ?');
-  $query->bind_param('sd', $image_name, $_SESSION['user_id']);
-  $query->execute();
-  if (!$query->affected_rows) {
-    $db->rollback();
-    return false;
-  }
-  if (!move_uploaded_file($image_tmp, './assets/images/' . $image_name)) {
-    $db->rollback();
-    return false;
-  }
-  if (!empty($old_image)) {
-    unlink("./assets/images/" . $old_image);
-  }
+  $dir = './assets/images/';
 
-  $db->commit();
+  $allow_exs = array('jpg', 'jpeg', 'png');
+  $image_ex = pathinfo($img_name, PATHINFO_EXTENSION);
+  $image_lowercase_ex = strtolower($image_ex);
 
-  return true;
+  if(!in_array($image_lowercase_ex, $allow_exs)){
+    throw new Exception('File extension is not allowed!');
 }
 
-function getUserImage($user_id)
-{
-  global $db;
-  $query = $db->prepare('SELECT photo FROM tbl_users WHERE id = ?');
-  $query->bind_param('d', $user_id);
-  $query->execute();
-  $result = $query->get_result();
-  if ($result->num_rows) {
-    return $result->fetch_object()->photo;
-  }
-  return null;
+if($error !== 0) {
+    throw new Exception('Unknow error occurred!');
 }
 
-function deleteUserImage()
-{
+if($img_size > 5000000) {
+    throw new Exception('File size is too large!');
+}
+
+$new_image_name = uniqid("PI-") . '.' . $image_lowercase_ex;
+$image_path = $dir . $new_image_name;
+move_uploaded_file($img_tmp, $image_path);
+return $image_path;
+}
+
+function changeProfileImage($image){
   global $db;
   $user = loggedInUser();
+  $image_path = uploadImage($image);
+  if($image_path && $user->photo){
+    unlink($user->photo);
+  }
+  $query = $db->prepare('UPDATE tbl_users SET photo = ? WHERE id = ?');
+  $query->bind_param('sd', $image_path, $user->id);
+  $query->execute();
+  if ($db->affected_rows) {
+    return true;
+  }
+  return false;
+}
+
+function deleteProfileImage(){
+  global $db;
+  $user = loggedInUser();
+  if($user->photo){
+    unlink($user->photo);
+  }
   $query = $db->prepare('UPDATE tbl_users SET photo = NULL WHERE id = ?');
   $query->bind_param('d', $user->id);
   $query->execute();
@@ -144,6 +151,4 @@ function deleteUserImage()
   }
   return false;
 }
-
-
 ?>

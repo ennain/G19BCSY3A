@@ -3,7 +3,7 @@ $oldPasswd = $newPasswd = $confirmNewPasswd = '';
 $oldPasswdErr = $newPasswdErr = '';
 
 $user = loggedInUser();
-$photo = !empty($user->photo) ? $user->photo : 'pic.png'; 
+$photo = !empty($user->photo) ? $user->photo : 'pic.png';
 
 if (isset($_POST['changePasswd'], $_POST['oldPasswd'], $_POST['newPasswd'], $_POST['confirmNewPasswd'])) {
     $oldPasswd = trim($_POST['oldPasswd']);
@@ -36,60 +36,36 @@ if (isset($_POST['changePasswd'], $_POST['oldPasswd'], $_POST['newPasswd'], $_PO
     }
 }
 
-if (isset($_POST['deletePhoto'])) {
-    $photopath = "./assets/images/". $photo;
-    if (file_exists($photopath) && $photo !== 'pic.png') {
-        unlink($photopath);
-        $response = deleteUserImage();
-        if ($response === true) {
-            $photo = 'pic.png';
-            echo '<div class="alert alert-success" role="alert">
-        photo deleted successfully.
-        </div>';
-        }
-    }
-}
-
 /*profile photo upload ? */
 if (isset($_POST['uploadPhoto'], $_FILES['photo'])) {
-    $photo = $_FILES['photo']['name'];
-    $photoTmp = $_FILES['photo']['tmp_name'];
-    $photosize = $_FILES['photo']['size'];
-    $photoError = $_FILES['photo']['error'];
-    $photoType = $_FILES['photo']['type'];
-
-    $fileExt = explode('.', $photo);
-    $fileActualExt = strtolower(end($fileExt));
-    $allowed = array('jpg', 'jpeg', 'png');
-    if (in_array($fileActualExt, $allowed)) {
-        if ($photoError === 0) {
-            if ($photosize < 1000000000) {
-                $response = insertImage($_FILES);
-                if ($response === true) {
-                    echo '<div class="alert alert-success" role="alert">
-                    photo updated successfully.
-                    </div>';
-                } else {
-                    echo '<div class="alert alert-danger" role="alert">
-                    try aggain.
-                    </div>';
-                }
+    $photo = $_FILES['photo'];
+    if (empty($photo['name'])) {
+        echo '<div class="alert alert-danger" role="alert">
+    Please select a photo to upload.
+    </div>';
+    } else {
+        try {
+            if (changeProfileImage($photo)) {
+                echo '<div class="alert alert-success" role="alert">
+            photo uploaded successfully.
+            </div>';
             } else {
                 echo '<div class="alert alert-danger" role="alert">
-                your file is too big.
-                </div>';
-            }
-        } else {
-            echo '<div class="alert alert-danger" role="alert">
-            there was an error uploading your file.
+            Failed to upload photo. Please try again.
             </div>';
-        }
-    } else {
-        echo '<div class="alert alert-danger" role="alert">
-        you cannot upload files of this type.
+            }
+        } catch (Exception $e) {
+            echo '<div class="alert alert-danger" role="alert">
+                ' . $e->getMessage() . '
         </div>';
+        }
     }
 }
+
+if (isset($_POST['deletePhoto'])) {
+    deleteProfileImage();
+}
+
 
 
 ?>
@@ -97,17 +73,15 @@ if (isset($_POST['uploadPhoto'], $_FILES['photo'])) {
     <div class="col-6">
         <form method="post" action="./?page=profile" enctype="multipart/form-data">
             <div class="d-flex justify-content-center">
-                <input name="photo" type="file" id="profileUpload" hidden accept=".png, .jpg , .jpeg">
+                <input name="photo" type="file" id="profileUpload" hidden>
                 <label role="button" for="profileUpload">
-                    <img src="./assets/images/<?php echo $photo ?>" class="rounded"
-                        style="width: 200px; height: 200px; object-fit: content;" alt="Profile Photo">
+                    <img src="<?php echo loggedInUser()->photo ?? './assets/images/pic.png' ?>"
+                        class="rounded img-thumbnail" style="max-width: 200px">
                 </label>
             </div>
             <div class="d-flex justify-content-center">
-                <button type="submit" name="deletePhoto" class="btn btn-danger"
-                    onclick="return confirm('are you sure you want to delete your profile photo?')">Delete</button>
-                <button type="submit" name="uploadPhoto" class="btn btn-success"
-                    onclick="return confirm('Do you want to upload this image?')">Upload</button>
+                <button type="submit" name="deletePhoto" class="btn btn-danger">Delete</button>
+                <button type="submit" name="uploadPhoto" class="btn btn-success">Upload</button>
             </div>
         </form>
     </div>
@@ -140,15 +114,3 @@ if (isset($_POST['uploadPhoto'], $_FILES['photo'])) {
     </div>
 </div>
 
-<script>
-    document.getElementById('profileUpload').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.querySelector('label img').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
