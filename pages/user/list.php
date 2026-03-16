@@ -9,17 +9,25 @@
                 <th>#</th>
                 <th>Photo</th>
                 <th>Name</th>
+                <th>Option</th>
             </tr>
             <?php
             $users = getUsers();
             $count = 1;
             while ($row = $users->fetch_object()) {
-                echo '<tr>
-                 <th>' . $count . '</th>
-                 <th>
-                 <img src="' . ($row->photo ?? './assets/images/pic.png') . '"
-                    class="rounded img-thumbnail" style="max-width:200px"></th>
-                 <th>' . $row->name . '</th>
+                echo
+                '<tr>
+                    <td>' . $count . '</td>
+                    <td>
+                    <img src="' . ($row->photo ?? './assets/images/pic.png') . '"
+                        class="rounded img-thumbnail" style="max-width:200px"></th>
+                    <td>' . $row->name . '</td>
+                    <td>
+                        <a href="./?page=user/update&id=' . $row->id . '" role="button" class="btn btn-primary">Update
+                        </a>
+                        <a href="./?page=user/delete&id=' . $row->id . '" role="button" class="btn btn-danger">Delete
+                        </a>
+                    </td>
                 </tr>';
                 $count++;
             }

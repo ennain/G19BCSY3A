@@ -24,5 +24,16 @@ function getUsers(){
         return $result;
 }
 
+function readUsers($id){
+    global $db;
+    $query = $db->prepare('SELECT * FROM tbl_users WHERE id = ?');
+    $query->bind_param('i', $id);
+    $query->execute();
+    $result = $query->get_result();
+    if($result->num_rows){
+        return $result->fetch_object();
+    }
+    return null;
+}
 
 ?>
